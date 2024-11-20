@@ -1,0 +1,75 @@
+<!-- templates/index.html -->
+{% extends 'layout.html' %} {% block content %}
+<div class="card">
+  <div class="card-header bg-white">
+    <h4 class="mb-0">
+      {% if current_user.role.name == 'Secretary' %} All Complaints {% elif
+      current_user.role.name == 'User' %} Your Complaints {% else %} Complaints
+      Assigned to {{ current_user.role.name }} {% endif %}
+    </h4>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Status</th>
+            {% if current_user.role.name == 'Secretary' %}
+            <th>Filed By</th>
+            <th>Assigned To</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for complaint in complaints %}
+          <tr>
+            <td>{{ complaint.id }}</td>
+            <td>
+              {{ complaint.category.name if complaint.category else 'N/A' }}
+            </td>
+            <td>{{ complaint.description }}</td>
+            <td>
+              <span
+                class="badge {% if complaint.status == 'New' %}bg-danger {% elif complaint.status.startswith('Assigned') %}bg-warning {% else %}bg-success {% endif %}"
+              >
+                {{ complaint.status }}
+              </span>
+            </td>
+            {% if current_user.role.name == 'Secretary' %}
+            <td>{{ complaint.user.username }}</td>
+
+            {% endif %}
+            <td>
+              {% if current_user.role.name == 'Secretary' %}
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="{{ url_for('assign_complaint', complaint_id=complaint.id) }}"
+                  class="btn btn-primary"
+                  >Assign</a
+                >
+                <a
+                  href="{{ url_for('update_complaint', complaint_id=complaint.id) }}"
+                  class="btn btn-info"
+                  >Update</a
+                >
+              </div>
+              {% elif current_user.role.name != 'User' and complaint.role_id ==
+              current_user.role.id %}
+              <a
+                href="{{ url_for('update_complaint', complaint_id=complaint.id) }}"
+                class="btn btn-sm btn-info"
+                >Update Progress</a
+              >
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
