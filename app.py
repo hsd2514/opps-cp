@@ -108,7 +108,27 @@ class FlaskApp:
 
     @login_required
     def file_complaint(self):
-        return self.complaint_controller.file_complaint()
+        if current_user.role.name != 'User':
+            flash('Only users can file complaints')
+            return redirect(url_for('index'))
+        
+        if request.method == 'POST':
+            description = request.form.get('description')
+            category_id = request.form.get('category')
+        
+            complaint = Complaint(
+                description=description,
+                category_id=category_id,
+                user_id=current_user.id,
+                status='New'
+            )
+            self.db.session.add(complaint)
+            self.db.session.commit()
+            flash('Complaint filed successfully')
+            return redirect(url_for('index'))
+        
+        categories = Category.query.all()
+        return render_template('file_complaint.html', categories=categories)
 
     @login_required
     def assign_complaint(self, complaint_id):

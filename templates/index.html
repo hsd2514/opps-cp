@@ -1,12 +1,20 @@
 <!-- templates/index.html -->
 {% extends 'layout.html' %} {% block content %}
 <div class="card">
-  <div class="card-header bg-white">
+  <div
+    class="card-header bg-white d-flex justify-content-between align-items-center"
+  >
     <h4 class="mb-0">
       {% if current_user.role.name == 'Secretary' %} All Complaints {% elif
-      current_user.role.name == 'User' %} Your Complaints {% else %} Complaints
-      Assigned to {{ current_user.role.name }} {% endif %}
+      current_user.role.name == 'User' %} Your Complaints {% else %} Assigned
+      Complaints {% endif %}
     </h4>
+    <!-- Show File Complaint button specifically for User role -->
+    {% if current_user.role.name == 'User' %}
+    <a href="{{ url_for('file_complaint') }}" class="btn btn-primary">
+      <i class="fas fa-plus"></i> File New Complaint
+    </a>
+    {% endif %}
   </div>
   <div class="card-body p-0">
     <div class="table-responsive">
